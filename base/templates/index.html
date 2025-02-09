@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+ 
+{% block content %}
+{% block main %}
+
+<div class="container-fluid">
+    <div class="card card-outline  border-secondary p-2">
+      <div class="card-body">
+        <h4 class="text-info">Pilih Kelas, Semester dan Tahun Pelajaran</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="kelas">Kelas :</label>
+            <select id="kelas" name="kelas" class="form-control" required>
+              <option value="" disabled selected>Pilih Kelas</option>
+              {% for kelas in set_kelas %}
+                <option>{{ kelas }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="semester">Semester :</label>
+            <select id="semester" name="semester" class="form-control" required>
+              <option value="" disabled selected>Pilih Semester</option>
+              {% for semester in semesters %}
+                <option>{{ semester }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tahun_ajaran">Tahun Pelajaran :</label>
+            <select id="tahun_ajaran" name="tahun_ajaran" class="form-control" required>
+              <option value="" disabled selected>Pilih Tahun Pelajaran</option>
+              {% for tahun_ajaran in tahun_pelajaran %}
+                <option>{{ tahun_ajaran }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-dark  mt-3 ">Search</button>
+        </form>
+    
+      </div>
+    </div>
+    
+    <style>
+      #card{
+          overflow-x: auto; /* Enable horizontal scrolling */
+          width: 100%; /* Set the width of the container */
+      }
+      #today_table{
+          overflow-x: auto; /* Enable horizontal scrolling */
+          width: 100%; /* Set the width of the container */
+      }
+    </style>
+    
+    <div class="card card-outline card-info"id="card">
+      <div class="card-header w-100">
+        <div class="card-title">
+          {% if kelas_dipilih %}
+          <h4 class="text-dark"> <span class="badge badge-light text-info p-2">Jadwal Mingguan:   {{ kelas_dipilih }} </span>  </h4>
+          <p class="text-info p-2"><i class="fas fa-building text-info p-2"></i> Jurusan {{ jurusan }}  [ Dari: {{ senin }} sampai {{ sabtu }} Tahun: {{ tahun_sekarang }} ]</p>
+          {% endif %}
+          
+         
+        </div>
+        <div class="card-tools">
+          <button id="btn" type="button" class="btn btn-tool w-100" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+      </div>  
+      <div class="card-body">
+    
+      
+       
+        <table id="today_table" class="table table-bordered border  table-hover w-100 text-dark">
+          <thead>
+            <tr>
+              <th colspan="10">Hari: 
+                {% for day in jadwal_data %}
+                  {{ day }},
+                {% endfor %}
+              </th>
+            </tr>
+            <tr>
+              <th>Hari</th>
+              <th>Tipe Sesi</th>
+              <th>Mata Pelajaran</th>
+              <th>Kode Mapel</th>
+              <th>Guru</th>
+              <th>Ruang</th>
+              <th>Waktu Mulai</th>
+              <th>Waktu Selesai</th>
+              <th colspan="2">Deskripsi Mapel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for day, entries in jadwal_data.items %}
+            {% for entry in entries %}
+            <tr>
+              {% if forloop.first %}
+              <td rowspan="{{ entries|length }}"><span class="badge badge-dark p-2 text-white">{{ day }}</span> <br><strong> Total Pelajaran: <span class="badge badge-primary badge-pill p-1">{{ entries|length }}</span></strong></td>
+              {% endif %}
+              <td>{{ entry.TipeSesi }}</td>
+              <td>{{ entry.NamaMapel.Mapel }}</td>
+              <td>{{ entry.NamaMapel.KodeMapel }}</td>
+              <td>{{ entry.Guru.NamaAwal }} {{ entry.Guru.NamaTengah }} {{ entry.Guru.NamaAkhir }}</td>
+              <td>{{ entry.Ruang }}</td>
+              <td><span class="badge badge-light p-2 text-primary">{{ entry.WaktuMulai }}</span></td>
+              <td><span class="badge badge-light p-2 text-danger">{{ entry.WaktuSelesai }}</span></td>
+              {% if forloop.first %}
+              <td rowspan="{{ entries|length }}">
+                 
+               <div class="card-header card-outline card-gray ">
+                <ol>
+                  {% for e in entries %}
+                    <li>    {{ e.NamaMapel.KodeMapel }} - {{ e.NamaMapel.DeskripsiMapel }}</li>
+                  {% endfor %}
+                </ol>
+              </div>
+             
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+        
+      </div>
+    </div> 
+
+{% endblock %}
+
+{% endblock %}
